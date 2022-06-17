@@ -1,6 +1,6 @@
-### Arduino Stabilized PPM capture via MQ135 and display to 16x2 LCD
+### Arduino Stabilized PPM capture via MQ135
 
-In order to prevent continous abrupt changes in MQ135 PPM captures due to inaccuracy, this repository implements a sample stabilization code that requires a minimum of 30-second worth of PPM capture to compute a sliding average of captured PPM.
+In order to prevent continous abrupt changes in MQ135 PPM captures due to inaccuracy, this repository implements a sample stabilization code that requires a minimum of 30-second worth of PPM capture to compute a sliding average of captured PPM. The final output is then displayed on both serial monitor and 16x2 LCD display.
 
 ### Context
 
