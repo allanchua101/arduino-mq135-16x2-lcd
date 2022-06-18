@@ -2,7 +2,7 @@
 
 ![Banner](https://github.com/allanchua101/arduino-mq135-16x2-lcd/blob/main/snaps/banner.png)
 
-In order to prevent continuos drastic shifts in MQ135 PPM captures due to inaccuracy, this repository implements a sample stabilization code that requires a minimum of 30-second worth of PPM capture to compute a sliding average of captured PPM. The final output is then displayed on both serial monitor and 16x2 LCD display.
+In order to prevent continuos drastic shifts in MQ135 PPM captures due to inaccuracy, this repository implements a sample stabilization code that requires a minimum of 10-second worth of PPM capture to compute a sliding average of captured PPM. The final output is then displayed on both serial monitor and 16x2 LCD display.
 
 ### MQ135 - Core Sensor
 
