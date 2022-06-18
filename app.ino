@@ -11,23 +11,23 @@ int LCD_D7 = 2;
 int LCD_V0 = 6;
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
-int width = 16;
-int height = 2;
-int contrast = 60;
+int LCD_WIDTH = 16;
+int LCD_HEIGHT = 2;
+int LCD_CONTRAST = 60;
 
 // Gas Sensor Configuration
 MQ135 gasSensor = MQ135(A1);
 int sensorPin = A0;
-int STABILIZER_COUNT = 30;
-float last30Ppms[30];
+int STABILIZER_COUNT = 10;
+float lastPpms[10];
 
 // float temperature = 24.0; // Morning temperature with AC (DHT11)
 float temperature = 22.0; // Evening temperature with AC (DHT11)
 // float temperature = 26.0; // Evening temperature without AC (DHT11)
 
 // float humidity = 80.0 // Singapore Morning DHT11
-// float humidity = 61.0; // Evening temperature without AC
-float humidity = 68.0; // Evening temperature with AC
+// float humidity = 61.0; // Evening humidity without AC
+float humidity = 68.0; // Evening humidity with AC
 
 
 float getAvg() {
@@ -35,7 +35,7 @@ float getAvg() {
   
   // Find sum of all array elements
   for(int i = 0; i < STABILIZER_COUNT; i++) {
-    sum += last30Ppms[i];
+    sum += lastPpms[i];
   }
  
   return sum / STABILIZER_COUNT;
@@ -44,16 +44,16 @@ float getAvg() {
 void setup() {
  Serial.begin(9600);
  
- analogWrite(LCD_V0, contrast);
+ analogWrite(LCD_V0, LCD_CONTRAST);
   
- lcd.begin(width, height);
+ lcd.begin(LCD_WIDTH, LCD_HEIGHT);
  pinMode(sensorPin,INPUT);
-
- delay(500);
  
  for(int i = 0; i < STABILIZER_COUNT; i++) {
-   last30Ppms[i] = 0;
+   lastPpms[i] = 0;
  }
+
+ delay(1000);
 
  Serial.println("Setup done");
 }
@@ -61,15 +61,15 @@ void setup() {
 void loop() {
   float correctedPPM = gasSensor.getCorrectedPPM(temperature, humidity);
   int timeInS = int(millis() / 1000);
-  int i = timeInS % 30;
-  last30Ppms[i] = correctedPPM;
+  int i = timeInS % STABILIZER_COUNT;
+  lastPpms[i] = correctedPPM;
 
-  if (timeInS < 30) {
+  if (timeInS < STABILIZER_COUNT) {
     lcd.setCursor(0, 0);
     lcd.print("Air Quality");
     lcd.setCursor(0, 1);
 
-    String msg = "Loading in " +  String(30 - timeInS) + "s";
+    String msg = "Loading in " +  String(STABILIZER_COUNT - timeInS) + "s";
     
     lcd.print(msg);
     Serial.println(msg);
@@ -85,17 +85,14 @@ void loop() {
   float rZero = gasSensor.getRZero();
   float correctedRZero = gasSensor.getCorrectedRZero(temperature, humidity);
 
-  Serial.print(raw);
-  Serial.print("\t");
-  Serial.print(rZero);
-  Serial.print("\t");
-  Serial.print(correctedRZero);
-  Serial.print("\t");
-  Serial.print(ppm);
-  Serial.print("\t");
-  Serial.print(correctedPPM);
-  Serial.print("\t");
-  Serial.print(String(getAvg(), 2));
+  Serial.print(
+    String(raw) + "\t" + 
+    String(rZero) + "\t" +
+    String(correctedRZero) + "\t" +
+    String(ppm) + "\t" +
+    String(correctedPPM) + "\t" +
+    String(getAvg(), 2)
+  );
   Serial.println();
     
   String strCrtPpm = String(getAvg(), 2);
